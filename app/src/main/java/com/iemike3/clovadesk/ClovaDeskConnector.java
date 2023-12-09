@@ -184,7 +184,7 @@ public class ClovaDeskConnector {
 
         HashMap hashMap = new HashMap();
         hashMap.put("clovaAuthCode", "ClovaDymmyCOde");
-        hashMap.put("clovaAuthState", "0");
+        hashMap.put("clovaAuthState", "333");
         hashMap.put("isClearUserData", false);
 
         BluetoothGattCharacteristic gattCharacteristic = getGattCharacteristic(clovaDesk_SET_PREPARE_INFO);
