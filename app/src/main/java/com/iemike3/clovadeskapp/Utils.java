@@ -4,16 +4,12 @@ import android.content.Context;
 import android.provider.Settings;
 import android.util.Log;
 
-import org.apache.commons.codec.digest.MessageDigestAlgorithms;
-
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.UUID;
-
-import kotlin.UByte;
 
 public final class Utils {
     public static final Utils INSTANCE = new Utils();
@@ -23,9 +19,9 @@ public final class Utils {
 
     public static String byteArrayToHex(byte[] bArr) {
         StringBuilder sb = new StringBuilder();
-        int length = bArr.length;
+        int length = bArr.length, MAX_VALUE = -1;
         for (int i = 0; i < length; i++) {
-            sb.append(String.format("%02x ", Integer.valueOf(bArr[i] & UByte.MAX_VALUE)));
+            sb.append(String.format("%02x ", Integer.valueOf(bArr[i] & MAX_VALUE)));
         }
         return sb.toString();
     }
