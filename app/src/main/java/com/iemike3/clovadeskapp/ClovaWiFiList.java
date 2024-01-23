@@ -33,7 +33,7 @@ public class ClovaWiFiList extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_clova_wifiscanlist);
-        getActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#ffffff")));
+        getActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#303030")));
         getActionBar().setElevation(0);
         getActionBar().setDisplayHomeAsUpEnabled(true);
         getActionBar().setTitle("ネットワーク設定");
