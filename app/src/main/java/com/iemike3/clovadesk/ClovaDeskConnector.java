@@ -1,6 +1,7 @@
 package com.iemike3.clovadesk;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -17,8 +18,6 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
-
-import androidx.core.app.ActivityCompat;
 
 import com.iemike3.clovadeskapp.ClovaDetails;
 import com.iemike3.clovadeskapp.ClovaWiFiList;
@@ -111,8 +110,13 @@ public class ClovaDeskConnector {
     }
      */
 
+
+    public static int checkSelfPermission(final Context context, final String permission) {
+        return ((context.getPackageManager().checkPermission(permission, context.getPackageName()) == PackageManager.PERMISSION_GRANTED) ? PackageManager.PERMISSION_GRANTED : PackageManager.PERMISSION_DENIED);
+    }
+
     public void setupConnection(BluetoothDevice clovaDeskBTDevice, BluetoothManager bluetoothManager, Runnable successFunction) {
-        if (ActivityCompat.checkSelfPermission(this.context, android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+        if (checkSelfPermission(this.context, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
         if (!clovaDeskBTDevice.getName().startsWith("CLOVA-DESK-")) {
@@ -125,7 +129,7 @@ public class ClovaDeskConnector {
     }
 
     public void disconnect() {
-        if (ActivityCompat.checkSelfPermission(this.context, android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+        if (checkSelfPermission(this.context, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
         if (gatt_state != 0) {
@@ -280,7 +284,7 @@ public class ClovaDeskConnector {
             gatt_state = newState;
             Log.i(this.getClass().getSimpleName(), "onConnectionStateChange: " + newState);
             if (newState == BluetoothGatt.STATE_CONNECTED) {
-                if (ActivityCompat.checkSelfPermission(ClovaDeskConnector.this.context, android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                if (checkSelfPermission(ClovaDeskConnector.this.context, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
                     return;
                 }
                 gatt.discoverServices();
@@ -291,7 +295,7 @@ public class ClovaDeskConnector {
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
             Log.i(this.getClass().getSimpleName(), "onServicesDiscovered");
-            if (ActivityCompat.checkSelfPermission(ClovaDeskConnector.this.context, android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+            if (checkSelfPermission(ClovaDeskConnector.this.context, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
                 return;
             }
             if (status != 0) {
@@ -334,6 +338,7 @@ public class ClovaDeskConnector {
             }
         }
 
+        @SuppressLint("MissingPermission")
         @Override
         public void onCharacteristicRead(BluetoothGatt gatt,
                                          BluetoothGattCharacteristic characteristic,
@@ -633,12 +638,11 @@ public class ClovaDeskConnector {
         if (ClovaDeskConnector.this.bluetoothAdapter == null || (bluetoothGatt = ClovaDeskConnector.this.bluetoothGatt) == null) {
             return;
         }
-        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+        if (checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
         bluetoothGatt.readCharacteristic(bluetoothGattCharacteristic);
     }
-
 
     public final void generateGattPublicKey() {
         byte[] bArr = new byte[32];
@@ -665,6 +669,7 @@ public class ClovaDeskConnector {
     }
 
 
+    @SuppressLint("MissingPermission")
     public final boolean setNotificationDescriptor(BluetoothGattCharacteristic bluetoothGattCharacteristic) {
         if (bluetoothGattCharacteristic == null) {
             return false;
@@ -772,6 +777,7 @@ public class ClovaDeskConnector {
     }
 
 
+    @SuppressLint("MissingPermission")
     private Boolean writeCharacteristic(BluetoothGattCharacteristic bluetoothGattCharacteristic, boolean z10) {
         BluetoothGatt bluetoothGatt;
         if (ClovaDeskConnector.this.bluetoothAdapter == null || (bluetoothGatt = ClovaDeskConnector.this.bluetoothGatt) == null) {

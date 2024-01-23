@@ -1,6 +1,7 @@
 package com.iemike3.clovadeskapp;
 
 import android.Manifest;
+import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothSocket;
@@ -16,12 +17,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-
 import com.iemike3.clovadesk.ClovaDeskConnector;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
 
     public static ClovaDeskConnector clovaDeskConnector;
 
@@ -30,6 +28,9 @@ public class MainActivity extends AppCompatActivity {
 
     private boolean icClovaDeskConnected = false;
 
+    public int checkSelfPermission(final String permission) {
+        return ((getPackageManager().checkPermission(permission, getPackageName()) == PackageManager.PERMISSION_GRANTED) ? PackageManager.PERMISSION_GRANTED : PackageManager.PERMISSION_DENIED);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,12 +47,6 @@ public class MainActivity extends AppCompatActivity {
         BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         bluetoothAdapter = bluetoothManager.getAdapter();
 
-        // BLEがサポートされてるかチェック
-        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
-            finish();
-            Toast.makeText(this, "BLEがサポートされていません。", Toast.LENGTH_SHORT).show();
-        }
-
         // Bluetoothが有効化されていなければ有効化するようにIntent
         if (!bluetoothAdapter.isEnabled()) {
             Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -63,10 +58,11 @@ public class MainActivity extends AppCompatActivity {
         BluetoothLeScanner bleScanner = bluetoothAdapter.getBluetoothLeScanner();
 
         ScanCallback scanCallBack = new ScanCallback() {
+
             @Override
             public void onScanResult(int callbackType, ScanResult result) {
                 if (callbackType == ScanSettings.CALLBACK_TYPE_ALL_MATCHES) {
-                    if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                    if (checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
                         /* Permission Error */
                         return;
                     }
@@ -97,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
 
-                if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+                if (checkSelfPermission(Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
                     requestPermissions(new String[]{Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.ACCESS_FINE_LOCATION}, 10);
                     return;
                 }

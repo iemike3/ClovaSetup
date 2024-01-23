@@ -1,113 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".OldMainActivity">
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        tools:layout_editor_absoluteX="1dp"
-        tools:layout_editor_absoluteY="1dp">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/connect_clovadesk"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Clova Deskに接続する" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/disconnect_clovadesk"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Clova Deskから切断する" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/check_clovadesk"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="check device" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/firmware_clovadesk"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="get firmware details" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/wifilist_clovadesk"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="get wifi list" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/setauth_clovadesk"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="set auth" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/protocolver_clovadesk"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="get protocol ver" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/prepareinfo_clovadesk"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="get prepare info" />
-        </LinearLayout>
+        <Button
+            android:id="@+id/connect_clovadesk"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Clova Deskに接続する" />
     </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/disconnect_clovadesk"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Clova Deskから切断する" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/check_clovadesk"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Check device" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/firmware_clovadesk"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Get firmware details" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/wifilist_clovadesk"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Get Wi-Fi list" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/setauth_clovadesk"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Set auth" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/protocolver_clovadesk"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Get protocol ver" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/prepareinfo_clovadesk"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Get prepare info" />
+    </LinearLayout>
+</LinearLayout>

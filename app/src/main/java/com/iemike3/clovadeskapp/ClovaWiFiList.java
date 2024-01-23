@@ -1,5 +1,6 @@
 package com.iemike3.clovadeskapp;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Color;
@@ -14,10 +15,6 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.Toast;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AppCompatEditText;
 
 import com.iemike3.clovadeskapp.clovawifi.WifiListAdapter;
 import com.iemike3.clovadeskapp.clovawifi.WifiListData;
@@ -28,7 +25,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class ClovaWiFiList extends AppCompatActivity {
+public class ClovaWiFiList extends Activity {
 
     private JSONArray clova_scaned_wifilist;
 
@@ -36,10 +33,10 @@ public class ClovaWiFiList extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_clova_wifiscanlist);
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#ffffff")));
-        getSupportActionBar().setElevation(0);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("ネットワーク設定");
+        getActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#ffffff")));
+        getActionBar().setElevation(0);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setTitle("ネットワーク設定");
 
         // レイアウトからリストビューを取得
         ListView listView = findViewById(R.id.ui_clova_wifi_scanlist);
@@ -49,7 +46,7 @@ public class ClovaWiFiList extends AppCompatActivity {
 
         Intent fromIntent = getIntent();
         Bundle extras = fromIntent.getExtras();
-        getSupportActionBar().setSubtitle(extras.getString("clova_device_name"));
+        getActionBar().setSubtitle(extras.getString("clova_device_name"));
 
         try {
             JSONObject jsonObject = new JSONObject(extras.getString("clova_return_json"));
@@ -101,7 +98,7 @@ public class ClovaWiFiList extends AppCompatActivity {
                             linearLayout = new LinearLayout(ClovaWiFiList.this);
                             linearLayout.setOrientation(LinearLayout.VERTICAL);
                             linearLayout.setPadding(15, 0, 15 ,0);
-                            editText = new AppCompatEditText(ClovaWiFiList.this);
+                            editText = new EditText(ClovaWiFiList.this);
                             editText.setInputType(129);
                             linearLayout.addView(editText);
                             CheckBox checkBox = new CheckBox(ClovaWiFiList.this);

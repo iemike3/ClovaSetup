@@ -4,48 +4,61 @@ plugins {
 
 android {
     namespace 'com.iemike3.clovadeskapp'
-    compileSdk 33
-
-    sourceSets {
-        main {
-            jniLibs.srcDir 'jniLibs'
-        }
-    }
+    compileSdk 34
 
     defaultConfig {
-        applicationId "com.iemike3.clovadeskapp"
         minSdk 24
-        targetSdk 33
+        targetSdk 34
         versionCode 1
         versionName "1.0"
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        //, "armeabi"
         ndk {
-            abiFilters "arm64-v8a", "armeabi-v7a"
+            //noinspection ChromeOsAbiSupport
+            abiFilters "armeabi-v7a", "arm64-v8a"
         }
     }
-
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+    signingConfigs {
+        android {
+            storeFile file('android.jks')
+            storePassword 'android'
+            keyAlias 'android'
+            keyPassword 'android'
         }
+        release {
+            storeFile file('release.jks')
+            storePassword System.getenv('STORE_PASSWORD')
+            keyAlias System.getenv('KEY_ALIAS')
+            keyPassword System.getenv('KEY_PASSWORD')
+        }
+    }
+    buildTypes {
+        debug {
+            minifyEnabled true
+            shrinkResources true
+            multiDexEnabled false
+            proguardFiles += 'proguard-rules.pro'
+            signingConfig signingConfigs.android
+        }
+        release {
+            minifyEnabled true
+            shrinkResources true
+            multiDexEnabled false
+            proguardFiles += 'proguard-rules.pro'
+            if (file('release.jks').exists()) {
+                signingConfig signingConfigs.release
+            }
+        }
+    }
+    packagingOptions {
+        jniLibs.useLegacyPackaging true
+        exclude 'org/apache/commons/codec/**'
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 }
 
 dependencies {
-
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.8.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
-    implementation fileTree(dir: "libs", include: ["*.jar"])
-    implementation 'commons-codec:commons-codec:1.11'
+    implementation 'commons-codec:commons-codec:1.16.0'
 }
