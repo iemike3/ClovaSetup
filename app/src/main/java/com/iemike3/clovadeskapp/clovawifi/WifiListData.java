@@ -1,7 +1,5 @@
 package com.iemike3.clovadeskapp.clovawifi;
 
-import android.widget.ProgressBar;
-
 public class WifiListData {
     private String mwifiName = null;
 
