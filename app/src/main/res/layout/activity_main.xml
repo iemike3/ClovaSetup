@@ -12,10 +12,10 @@
         android:paddingBottom="20px">
 
         <Button
-            android:id="@+id/connect_clovadesk"
+            android:id="@+id/connect_clova"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Clova Deskに接続する" />
+            android:text="Clovaに接続する" />
     </LinearLayout>
 
     <LinearLayout
@@ -25,10 +25,11 @@
         android:paddingBottom="20px">
 
         <Button
-            android:id="@+id/disconnect_clovadesk"
+            android:id="@+id/disconnect_clova"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Clova Deskから切断する" />
+            android:enabled="false"
+            android:text="Clovaを切断する" />
     </LinearLayout>
 
     <LinearLayout
@@ -67,7 +68,7 @@
             android:id="@+id/wifilist_clovadesk"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Get Wi-Fi list" />
+            android:text="Scan Wi-Fi" />
     </LinearLayout>
 
     <LinearLayout
@@ -80,7 +81,7 @@
             android:id="@+id/setauth_clovadesk"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Set auth" />
+            android:text="Set Auth" />
     </LinearLayout>
 
     <LinearLayout
@@ -93,7 +94,21 @@
             android:id="@+id/protocolver_clovadesk"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Get protocol ver" />
+            android:text="Get Protocol Ver" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        android:paddingBottom="20px">
+
+        <Button
+            android:id="@+id/prepareinfo_clovadesk"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Get prepare info" />
     </LinearLayout>
 
     <LinearLayout
@@ -102,9 +117,16 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/prepareinfo_clovadesk"
+            android:id="@+id/clova_enable_btpan"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Get prepare info" />
+            android:text="Enable BTPan" />
+
+        <Button
+            android:id="@+id/clova_disable_btpan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Disable BTPan" />
     </LinearLayout>
+
 </LinearLayout>

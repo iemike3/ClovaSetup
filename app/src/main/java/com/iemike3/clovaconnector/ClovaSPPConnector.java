@@ -1,14 +1,10 @@
 package com.iemike3.clovaconnector;
 
-import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.util.Log;
-
-import androidx.core.app.ActivityCompat;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -105,9 +101,9 @@ public class ClovaSPPConnector {
         }
     }
 
-    public void enableBTPan() {
+    public void getProtocolVersion() {
         if (clovaConnectedThread != null && clovaConnectedThread.isConnected()) {
-            clovaConnectedThread.enableBTPan();
+            clovaConnectedThread.getProtocolVersion();
         } else {
             if (ClovaSPPConnector.this.clovaSPPCallback != null) {
                 ClovaSPPConnector.this.clovaSPPCallback.onError(ERROR_NOT_CONNECTED, "");
@@ -115,10 +111,24 @@ public class ClovaSPPConnector {
         }
     }
 
-    private void onConnected(BluetoothSocket clovaBluetoothSocket) {
-        Log.i("ta", "connected");
-        clovaConnectedThread = new ClovaConnectedThread(clovaBluetoothSocket);
-        clovaConnectedThread.start();
+    public void getPrepareInfo() {
+        if (clovaConnectedThread != null && clovaConnectedThread.isConnected()) {
+            clovaConnectedThread.getPrepareInfo();
+        } else {
+            if (ClovaSPPConnector.this.clovaSPPCallback != null) {
+                ClovaSPPConnector.this.clovaSPPCallback.onError(ERROR_NOT_CONNECTED, "");
+            }
+        }
+    }
+
+    public void toggleBTPan(Boolean isEnabled) {
+        if (clovaConnectedThread != null && clovaConnectedThread.isConnected()) {
+            clovaConnectedThread.toggleBTPan(isEnabled);
+        } else {
+            if (ClovaSPPConnector.this.clovaSPPCallback != null) {
+                ClovaSPPConnector.this.clovaSPPCallback.onError(ERROR_NOT_CONNECTED, "");
+            }
+        }
     }
 
     class ClovaConnectThread extends Thread {
@@ -166,7 +176,9 @@ public class ClovaSPPConnector {
                 if (ClovaSPPConnector.this.clovaSPPCallback != null) {
                     ClovaSPPConnector.this.clovaSPPCallback.onConnected(clovaDevice.getName());
                 }
-                ClovaSPPConnector.this.onConnected(this.clovaBluetoothSocket);
+
+                clovaConnectedThread = new ClovaConnectedThread(clovaBluetoothSocket);
+                clovaConnectedThread.start();
             }
         }
     }
@@ -191,7 +203,7 @@ public class ClovaSPPConnector {
 
         public void checkMyDevice() {
             try {
-                this.outputStream.write("APCD".getBytes(StandardCharsets.UTF_8));
+                this.outputStream.write(new byte[]{65, 80, 67, 68, 82, 81, 0, 0});
                 this.outputStream.flush();
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -200,7 +212,7 @@ public class ClovaSPPConnector {
 
         public void getDetails() {
             try {
-                this.outputStream.write("APGF".getBytes(StandardCharsets.UTF_8));
+                this.outputStream.write(new byte[]{65, 80, 71, 70, 82, 81, 0, 0});
                 this.outputStream.flush();
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -209,7 +221,7 @@ public class ClovaSPPConnector {
 
         public void getWifiList() {
             try {
-                this.outputStream.write("APGN".getBytes(StandardCharsets.UTF_8));
+                this.outputStream.write(new byte[]{65, 80, 71, 78, 82, 81, 0, 0});
                 this.outputStream.flush();
             } catch (IOException e) {
                 throw new RuntimeException(e);
@@ -270,10 +282,28 @@ public class ClovaSPPConnector {
             }
         }
 
-        public void enableBTPan() {
+        public void getProtocolVersion() {
+            try {
+                this.outputStream.write(new byte[]{65, 80, 80, 86, 82, 81, 0, 0});
+                this.outputStream.flush();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        public void getPrepareInfo() {
+            try {
+                this.outputStream.write(new byte[]{65, 80, 71, 80, 82, 81, 0, 0});
+                this.outputStream.flush();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        public void toggleBTPan(Boolean isEnabled) {
             JSONObject sendJSON = new JSONObject();
             try {
-                sendJSON.put("tethering_enable", true);
+                sendJSON.put("tethering_enable", isEnabled);
             } catch (JSONException e) {
                 throw new RuntimeException(e);
             }
@@ -330,7 +360,7 @@ public class ClovaSPPConnector {
                                 int data_length = new BigInteger(new byte[]{bArr4[6], bArr4[7]}).intValue();
                                 String data = new String(bArr4, 8, data_length);
                                 if (ClovaSPPConnector.this.clovaSPPCallback != null) {
-                                    ClovaSPPConnector.this.clovaSPPCallback.onMessage(clovaDevice, data_type, data);
+                                    ClovaSPPConnector.this.clovaSPPCallback.onClovaData(clovaDevice, data_type, data);
                                 }
 
                                 z2 = false;
@@ -368,7 +398,7 @@ public class ClovaSPPConnector {
                         int data_length = new BigInteger(new byte[]{bArr6[6], bArr6[7]}).intValue();
                         String data = new String(bArr6, 8, data_length);
                         if (ClovaSPPConnector.this.clovaSPPCallback != null) {
-                            ClovaSPPConnector.this.clovaSPPCallback.onMessage(clovaDevice, data_type, data);
+                            ClovaSPPConnector.this.clovaSPPCallback.onClovaData(clovaDevice, data_type, data);
                         }
 
                         z = false;

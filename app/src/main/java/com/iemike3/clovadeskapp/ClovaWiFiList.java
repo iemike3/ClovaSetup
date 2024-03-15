@@ -2,9 +2,8 @@ package com.iemike3.clovadeskapp;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.method.PasswordTransformationMethod;
 import android.view.MenuItem;
@@ -27,18 +26,16 @@ import java.util.ArrayList;
 
 public class ClovaWiFiList extends Activity {
 
-    private JSONArray clova_scaned_wifilist;
+    private JSONArray clovaWiFiJson;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_clova_wifiscanlist);
-        getActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#303030")));
-        getActionBar().setElevation(0);
-        getActionBar().setDisplayHomeAsUpEnabled(true);
-        getActionBar().setTitle("ネットワーク設定");
 
-        // レイアウトからリストビューを取得
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setTitle("Wi-Fiに接続");
+
         ListView listView = findViewById(R.id.ui_clova_wifi_scanlist);
 
         // リストビューに表示する要素を設定
@@ -49,11 +46,9 @@ public class ClovaWiFiList extends Activity {
         getActionBar().setSubtitle(extras.getString("clova_device_name"));
 
         try {
-            JSONObject jsonObject = new JSONObject(extras.getString("clova_return_json"));
-            clova_scaned_wifilist = jsonObject.getJSONArray("wifi");
-
-            for (int i = 0;i < clova_scaned_wifilist.length(); i++) {
-                JSONObject wifi = clova_scaned_wifilist.getJSONObject(i);
+            clovaWiFiJson = new JSONObject(extras.getString("clovaWiFiJson")).getJSONArray("wifi");
+            for (int i = 0;i < clovaWiFiJson.length(); i++) {
+                JSONObject wifi = clovaWiFiJson.getJSONObject(i);
                 String ssid = wifi.getString("ssid");
                 //int signal_level = wifi.getInt("signal_level");
 
@@ -78,15 +73,9 @@ public class ClovaWiFiList extends Activity {
             ListView listView = (ListView) parent;
             WifiListData item = (WifiListData) listView.getItemAtPosition(position);  // SampleListItemにキャスト
 
-            /*
-            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-            builder.setTitle("Tap No. " + String.valueOf(position));
-            builder.setMessage(item.getPkgname());
-            builder.show();
-             */
             try {
-                for (int i = 0;i < clova_scaned_wifilist.length(); i++) {
-                    JSONObject wifi = clova_scaned_wifilist.getJSONObject(i);
+                for (int i = 0; i < clovaWiFiJson.length(); i++) {
+                    JSONObject wifi = clovaWiFiJson.getJSONObject(i);
                     String ssid = wifi.getString("ssid");
                     if (item.getWifiName().equals(ssid)) {
                         LinearLayout linearLayout = null;
@@ -118,19 +107,19 @@ public class ClovaWiFiList extends Activity {
                             alertDialog.setView(linearLayout);
                         }
                         EditText finalEditText1 = editText;
-                        alertDialog.setPositiveButton("接続する", (dialog, id_) -> {
-                            String password = null;
-                            try {
-                                if (wifi.getInt("key_mgmt") != 0) {
-                                    password = finalEditText1.getText().toString();
-                                }
-                            } catch (JSONException e) {
-                                throw new RuntimeException(e);
-                            }
-                            try {
-                                MainActivity.clovaDeskConnector.connectWifi(ssid, password);
-                            } catch (JSONException e) {
-                                throw new RuntimeException(e);
+                        alertDialog.setPositiveButton("接続する", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                String password = null;
+                                try {
+                                    if (wifi.getInt("key_mgmt") != 0) {
+                                        wifi.remove("psk");
+                                        wifi.put("psk", finalEditText1.getText().toString());
+                                    }
+                                 } catch (JSONException e) {
+                                    throw new RuntimeException(e);
+                                 }
+                                 MainActivity.clovaSPPConnector.connectWifi(wifi);
                             }
                         });
                         alertDialog.show();
