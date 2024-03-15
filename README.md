@@ -1,3 +1,3 @@
-# ClovaDesk Setup
+# ClovaSetup
 
-初期化済みの CLOVA Desk のセットアップをバイパスします
+初期化済みの CLOVA のセットアップをバイパスします
