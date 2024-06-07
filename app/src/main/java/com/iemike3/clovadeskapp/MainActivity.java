@@ -188,6 +188,7 @@ public class MainActivity extends Activity {
     }
 
     class ClovaSearchBroadcastReceiver extends BroadcastReceiver {
+        @SuppressWarnings("deprecation")
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction() != null && intent.getAction().equals(BluetoothDevice.ACTION_FOUND)) {

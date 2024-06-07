@@ -11,12 +11,10 @@ android {
         targetSdk 34
         versionCode 1
         versionName "1.0"
-
-        ndk {
-            //noinspection ChromeOsAbiSupport
-            abiFilters "armeabi-v7a", "arm64-v8a"
-        }
+        proguardFiles += 'proguard-rules.pro'
+        multiDexEnabled false
     }
+
     signingConfigs {
         android {
             storeFile file('android.jks')
@@ -24,35 +22,21 @@ android {
             keyAlias 'android'
             keyPassword 'android'
         }
-        release {
-            storeFile file('release.jks')
-            storePassword System.getenv('STORE_PASSWORD')
-            keyAlias System.getenv('KEY_ALIAS')
-            keyPassword System.getenv('KEY_PASSWORD')
-        }
     }
+
     buildTypes {
-        debug {
+        configureEach {
             minifyEnabled true
             shrinkResources true
-            multiDexEnabled false
-            proguardFiles += 'proguard-rules.pro'
             signingConfig signingConfigs.android
         }
-        release {
-            minifyEnabled true
-            shrinkResources true
-            multiDexEnabled false
-            proguardFiles += 'proguard-rules.pro'
-            if (file('release.jks').exists()) {
-                signingConfig signingConfigs.release
-            }
-        }
     }
+
     packagingOptions {
         jniLibs.useLegacyPackaging true
         exclude 'org/apache/commons/codec/**'
     }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
