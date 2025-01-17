@@ -77,12 +77,32 @@ public class ClovaWiFiList extends Activity {
                 for (int i = 0; i < clovaWiFiJson.length(); i++) {
                     JSONObject wifi = clovaWiFiJson.getJSONObject(i);
                     String ssid = wifi.getString("ssid");
+
                     if (item.getWifiName().equals(ssid)) {
                         LinearLayout linearLayout = null;
                         EditText editText = null;
+                        String alertDialogMsg = "";
+                        alertDialogMsg += "RSSI: " + String.valueOf(wifi.getInt("signal_level")) + "\n";
+
+                        switch (wifi.getInt("key_mgmt")) {
+                            case 0:
+                                alertDialogMsg += "暗号化：なし\n";
+                                break;
+                            case 2:
+                                alertDialogMsg += "暗号化：EAP\n";
+                                break;
+                            case 4:
+                                alertDialogMsg += "暗号化：PSK\n";
+                                break;
+                            case 8:
+                                alertDialogMsg += "暗号化：WEP\n";
+                                break;
+                        }
+
                         AlertDialog.Builder alertDialog =  new AlertDialog.Builder(ClovaWiFiList.this);
                         alertDialog.setTitle(ssid);
-                        alertDialog.setMessage(wifi.toString());
+                        alertDialog.setMessage(alertDialogMsg);
+
                         if (wifi.getInt("key_mgmt") != 0) {
                             linearLayout = new LinearLayout(ClovaWiFiList.this);
                             linearLayout.setOrientation(LinearLayout.VERTICAL);

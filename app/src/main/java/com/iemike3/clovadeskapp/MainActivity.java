@@ -8,14 +8,21 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.os.Build;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -56,7 +63,6 @@ public class MainActivity extends Activity {
             startActivityForResult(intent, 20);
         }
 
-
         //buildScanFilters(), buildScanSettings(),
         findViewById(R.id.connect_clova).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -92,12 +98,12 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
                 findViewById(R.id.connect_clova).setEnabled(true);
                 findViewById(R.id.disconnect_clova).setEnabled(false);
-                Toast.makeText(MainActivity.this, "切断しました", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "切断しました。", Toast.LENGTH_SHORT).show();
                 clovaSPPConnector.close();
             }
         });
 
-        findViewById(R.id.check_clovadesk).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.clova_checkdevice).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (clovaSPPConnector != null) {
@@ -108,7 +114,7 @@ public class MainActivity extends Activity {
             }
         });
 
-        findViewById(R.id.firmware_clovadesk).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.clova_firmware).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (clovaSPPConnector != null) {
@@ -119,7 +125,7 @@ public class MainActivity extends Activity {
             }
         });
 
-        findViewById(R.id.wifilist_clovadesk).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.clova_wifilist).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (clovaSPPConnector != null) {
@@ -130,7 +136,7 @@ public class MainActivity extends Activity {
             }
         });
 
-        findViewById(R.id.setauth_clovadesk).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.clova_setauth).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (clovaSPPConnector != null) {
@@ -141,7 +147,7 @@ public class MainActivity extends Activity {
             }
         });
 
-        findViewById(R.id.protocolver_clovadesk).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.clova_protocolver).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (clovaSPPConnector != null) {
@@ -152,7 +158,7 @@ public class MainActivity extends Activity {
             }
         });
 
-        findViewById(R.id.prepareinfo_clovadesk).setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.clova_prepareinfo).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (clovaSPPConnector != null) {
@@ -185,6 +191,88 @@ public class MainActivity extends Activity {
             }
         });
 
+        findViewById(R.id.clova_changeserver).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (clovaSPPConnector != null) {
+                    View clova_changeserver = LayoutInflater.from(MainActivity.this).inflate(R.layout.dialog_clova_changeserver, null);
+                    LinearLayout clova_layout_custom_svurl = clova_changeserver.findViewById(R.id.clova_layout_custom_svurl);
+                    EditText clova_edittext_svurl = clova_changeserver.findViewById(R.id.clova_edittext_svurl);
+
+                    ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_item);
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+                    adapter.add("LINE (Production)");
+                    adapter.add("NAVER (Production)");
+                    adapter.add("Custom");
+
+                    Spinner spinner = (Spinner) clova_changeserver.findViewById(R.id.clova_connectto_server_spinner);
+                    spinner.setAdapter(adapter);
+                    spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                        @Override
+                        public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                            switch (position) {
+                                case 0: // LINE (Production)
+                                    clova_layout_custom_svurl.setVisibility(View.GONE);
+                                    break;
+                                case 1: // NAVER (Production)
+                                    clova_layout_custom_svurl.setVisibility(View.GONE);
+                                    break;
+                                case 2: // Custom
+                                    clova_layout_custom_svurl.setVisibility(View.VISIBLE);
+                                    break;
+                            }
+                        }
+
+                        @Override
+                        public void onNothingSelected(AdapterView<?> parentView) {
+                        }
+                    });
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this)
+                            .setView(clova_changeserver)
+                            .setNegativeButton("キャンセル", null)
+                            .setPositiveButton("サーバーを変更", null);
+
+                    AlertDialog dialog = builder.show();
+                    Button button = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
+
+                    button.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            switch (spinner.getSelectedItemPosition()) {
+                                case 0: // LINE (Production)
+                                    clovaSPPConnector.sendScheme(Uri.parse("clovadevice://server_setting/0"));
+                                    dialog.dismiss();
+                                    break;
+                                case 1: // NAVER (Production)
+                                    clovaSPPConnector.sendScheme(Uri.parse("clovadevice://server_setting/3"));
+                                    dialog.dismiss();
+                                    break;
+                                case 2: // Custom
+                                    if (!clova_edittext_svurl.getText().toString().startsWith("https://")) {
+                                        Toast.makeText(MainActivity.this, "サーバーURLが無効です。", Toast.LENGTH_SHORT).show();
+                                        break;
+                                    }
+                                    Uri.Builder uriBuilder = Uri.parse("clovadevice://server_setting/10").buildUpon();
+                                    uriBuilder.appendQueryParameter("cic", clova_edittext_svurl.getText().toString());
+                                    uriBuilder.appendQueryParameter("auth", clova_edittext_svurl.getText().toString());
+                                    uriBuilder.appendQueryParameter("client_id", "fake_client_id");
+                                    uriBuilder.appendQueryParameter("client_secret_id", "fake_secret_id");
+                                    clovaSPPConnector.sendScheme(uriBuilder.build());
+                                    dialog.dismiss();
+                                    break;
+                                default:
+                                    return;
+                            }
+                        }
+                    });
+                } else {
+                    Toast.makeText(MainActivity.this, "Clovaが接続されていません", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
     }
 
     class ClovaSearchBroadcastReceiver extends BroadcastReceiver {
@@ -193,11 +281,6 @@ public class MainActivity extends Activity {
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction() != null && intent.getAction().equals(BluetoothDevice.ACTION_FOUND)) {
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    if (checkSelfPermission(Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
-                        return;
-                    }
-                }
                 if (device.getName() != null && (device.getName().startsWith("WAVE-") || device.getName().startsWith("CLOVA-")) && device.getType() != 2) {
                     // CLOVAを発見
                     unregisterReceiver(this);
@@ -314,6 +397,5 @@ public class MainActivity extends Activity {
             }
         }
     }
-
 }
 

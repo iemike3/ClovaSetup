@@ -39,7 +39,7 @@
         android:paddingBottom="20px">
 
         <Button
-            android:id="@+id/check_clovadesk"
+            android:id="@+id/clova_checkdevice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Check device" />
@@ -52,7 +52,7 @@
         android:paddingBottom="20px">
 
         <Button
-            android:id="@+id/firmware_clovadesk"
+            android:id="@+id/clova_firmware"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Get firmware details" />
@@ -65,7 +65,7 @@
         android:paddingBottom="20px">
 
         <Button
-            android:id="@+id/wifilist_clovadesk"
+            android:id="@+id/clova_wifilist"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Scan Wi-Fi" />
@@ -78,7 +78,7 @@
         android:paddingBottom="20px">
 
         <Button
-            android:id="@+id/setauth_clovadesk"
+            android:id="@+id/clova_setauth"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Set Auth" />
@@ -91,7 +91,7 @@
         android:paddingBottom="20px">
 
         <Button
-            android:id="@+id/protocolver_clovadesk"
+            android:id="@+id/clova_protocolver"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Get Protocol Ver" />
@@ -105,7 +105,7 @@
         android:paddingBottom="20px">
 
         <Button
-            android:id="@+id/prepareinfo_clovadesk"
+            android:id="@+id/clova_prepareinfo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Get prepare info" />
@@ -114,6 +114,20 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:paddingBottom="20px">
+
+        <Button
+            android:id="@+id/clova_changeserver"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Change Server" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
         android:orientation="horizontal">
 
         <Button

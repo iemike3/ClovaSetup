@@ -4,8 +4,10 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
+import android.net.Uri;
 import android.util.Log;
 
+import org.apache.commons.codec.binary.Base64;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -124,6 +126,16 @@ public class ClovaSPPConnector {
     public void toggleBTPan(Boolean isEnabled) {
         if (clovaConnectedThread != null && clovaConnectedThread.isConnected()) {
             clovaConnectedThread.toggleBTPan(isEnabled);
+        } else {
+            if (ClovaSPPConnector.this.clovaSPPCallback != null) {
+                ClovaSPPConnector.this.clovaSPPCallback.onError(ERROR_NOT_CONNECTED, "");
+            }
+        }
+    }
+
+    public void sendScheme(Uri url) {
+        if (clovaConnectedThread != null && clovaConnectedThread.isConnected()) {
+            clovaConnectedThread.sendScheme(url);
         } else {
             if (ClovaSPPConnector.this.clovaSPPCallback != null) {
                 ClovaSPPConnector.this.clovaSPPCallback.onError(ERROR_NOT_CONNECTED, "");
@@ -323,6 +335,28 @@ public class ClovaSPPConnector {
             try {
                 this.outputStream.write(bArr);
                 this.outputStream.flush();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        public void sendScheme(Uri url) {
+            byte[] bytes = Base64.encodeBase64(url.toString().getBytes());
+            byte[] bArr = new byte[bytes.length + 8];
+            bArr[0] = 65;
+            bArr[1] = 80;
+            bArr[2] = 83;
+            bArr[3] = 67;
+            bArr[4] = 82;
+            bArr[5] = 81;
+            if (bytes != null) {
+                int length = bytes.length;
+                System.arraycopy(new byte[]{(byte) (length >> 8), (byte) length}, 0, bArr, 6, 2);
+                System.arraycopy(bytes, 0, bArr, 8, length);
+            }
+            try {
+                outputStream.write(bArr);
+                outputStream.flush();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
