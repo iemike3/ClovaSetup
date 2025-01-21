@@ -12,8 +12,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,11 +38,62 @@ import org.json.JSONObject;
 public class MainActivity extends Activity {
 
     public static ClovaSPPConnector clovaSPPConnector;;
-
     private BluetoothAdapter bluetoothAdapter;
+    private ClovaSearchBroadcastReceiver clovaSearchBroadcastReceiver;
 
     public int checkSelfPermission(final String permission) {
         return ((getPackageManager().checkPermission(permission, getPackageName()) == PackageManager.PERMISSION_GRANTED) ? PackageManager.PERMISSION_GRANTED : PackageManager.PERMISSION_DENIED);
+    }
+
+    public void requestNeedPermissions() {
+        String[] needPermissions;
+        boolean isNeedRequestPermission = false;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                needPermissions = new String[]{Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.ACCESS_FINE_LOCATION};
+            } else {
+                needPermissions = new String[]{Manifest.permission.ACCESS_FINE_LOCATION};
+            }
+        } else {
+            needPermissions = new String[]{Manifest.permission.ACCESS_COARSE_LOCATION};
+        }
+        for (String permission : needPermissions) {
+            if (checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
+                isNeedRequestPermission = true;
+            }
+        }
+        if (isNeedRequestPermission) {
+            requestPermissions(needPermissions, 1100);
+        }
+    }
+
+    public boolean checkNeedPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                if (checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED &&
+                        checkSelfPermission(Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED &&
+                        checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    return true;
+                }
+                return false;
+            } else {
+                if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    return true;
+                }
+                return false;
+            }
+        } else {
+            if (checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                return true;
+            }
+            return false;
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(clovaSearchBroadcastReceiver);
     }
 
     @Override
@@ -47,20 +101,13 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (checkSelfPermission(Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED &&
-                checkSelfPermission(Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED &&
-                checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-        } else {
-            requestPermissions(new String[]{Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.ACCESS_FINE_LOCATION}, 10);
-        }
-
         BluetoothManager bluetoothManager = (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         bluetoothAdapter = bluetoothManager.getAdapter();
 
         // Bluetoothが有効化されていなければ有効化するようにIntent
         if (!bluetoothAdapter.isEnabled()) {
             Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(intent, 20);
+            startActivityForResult(intent, 1000);
         }
 
         //buildScanFilters(), buildScanSettings(),
@@ -70,12 +117,12 @@ public class MainActivity extends Activity {
 
                 if (!bluetoothAdapter.isEnabled()) {
                     Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                    startActivityForResult(intent, 21);
+                    startActivityForResult(intent, 1001);
                     return;
                 }
 
-                if (checkSelfPermission(Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
-                    requestPermissions(new String[]{Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.ACCESS_FINE_LOCATION}, 10);
+                if (!checkNeedPermissions()) {
+                    requestNeedPermissions();
                     return;
                 }
 
@@ -83,22 +130,38 @@ public class MainActivity extends Activity {
 
                 IntentFilter intentFilter = new IntentFilter();
                 intentFilter.addAction(BluetoothDevice.ACTION_FOUND);
-                registerReceiver(new ClovaSearchBroadcastReceiver(), intentFilter);
+                clovaSearchBroadcastReceiver = new ClovaSearchBroadcastReceiver();
+                registerReceiver(clovaSearchBroadcastReceiver, intentFilter);
+
+                LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
                 if (bluetoothAdapter.startDiscovery()) {
                     Toast.makeText(MainActivity.this, "Clovaを検索中", Toast.LENGTH_SHORT).show();
                 } else {
+                    if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q && !locationManager.isLocationEnabled()) {
+                        new AlertDialog.Builder(MainActivity.this)
+                                .setMessage("Clovaに接続するには、位置情報を有効にしてください。")
+                                .setPositiveButton("有効にする", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                                        startActivity(intent);
+                                    }
+                                })
+                                .show();
+                    }
                     findViewById(R.id.connect_clova).setEnabled(true);
                     Toast.makeText(MainActivity.this, "Clovaの検索に失敗しました。", Toast.LENGTH_SHORT).show();
                 }
             }
         });
+
         findViewById(R.id.disconnect_clova).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 findViewById(R.id.connect_clova).setEnabled(true);
                 findViewById(R.id.disconnect_clova).setEnabled(false);
-                Toast.makeText(MainActivity.this, "切断しました。", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "切断しました", Toast.LENGTH_SHORT).show();
                 clovaSPPConnector.close();
             }
         });
@@ -283,7 +346,7 @@ public class MainActivity extends Activity {
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 if (device.getName() != null && (device.getName().startsWith("WAVE-") || device.getName().startsWith("CLOVA-")) && device.getType() != 2) {
                     // CLOVAを発見
-                    unregisterReceiver(this);
+                    unregisterReceiver(clovaSearchBroadcastReceiver);
                     clovaSPPConnector = new ClovaSPPConnector(MainActivity.this, bluetoothAdapter, new ClovaSPPCallback() {
                         @Override
                         public void onConnected(String clovaDeviceName) {
@@ -388,12 +451,47 @@ public class MainActivity extends Activity {
         }
     }
 
+    /*
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 10) {
+        if (requestCode == 1000) {
             if (resultCode != RESULT_OK) {
-                requestPermissions(new String[]{Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.ACCESS_FINE_LOCATION}, 10);
+
+            }
+        }
+    }
+     */
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 1100) {
+            if (!checkNeedPermissions()) {
+                String[] needPermissions;
+                boolean isNeedOpenSettings = false;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        needPermissions = new String[]{Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.ACCESS_FINE_LOCATION};
+                    } else {
+                        needPermissions = new String[]{Manifest.permission.ACCESS_FINE_LOCATION};
+                    }
+                } else {
+                    needPermissions = new String[]{Manifest.permission.ACCESS_COARSE_LOCATION};
+                }
+                for (String permission : needPermissions) {
+                    if (checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
+                        if (!shouldShowRequestPermissionRationale(permission)) {
+                            isNeedOpenSettings = true;
+                        }
+                    }
+                }
+                if (isNeedOpenSettings) {
+                    Toast.makeText(this, "一部の権限が拒否されました。\n設定画面から許可してください。", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:" + getPackageName()));
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                }
             }
         }
     }
