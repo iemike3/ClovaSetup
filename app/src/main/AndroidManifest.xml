@@ -37,7 +37,7 @@
         </activity>
 
         <activity
-            android:name=".ClovaWiFiList"
+            android:name=".ClovaWiFiScanResultActivity"
             android:exported="false" />
     </application>
 

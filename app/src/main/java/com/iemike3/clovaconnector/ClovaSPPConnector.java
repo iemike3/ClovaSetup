@@ -133,7 +133,7 @@ public class ClovaSPPConnector {
         }
     }
 
-    public void sendScheme(Uri url) {
+    public void sendScheme(String url) {
         if (clovaConnectedThread != null && clovaConnectedThread.isConnected()) {
             clovaConnectedThread.sendScheme(url);
         } else {
@@ -186,7 +186,7 @@ public class ClovaSPPConnector {
             }
             if (this.clovaBluetoothSocket.isConnected()) {
                 if (ClovaSPPConnector.this.clovaSPPCallback != null) {
-                    ClovaSPPConnector.this.clovaSPPCallback.onConnected(clovaDevice.getName());
+                    ClovaSPPConnector.this.clovaSPPCallback.onConnected(clovaDevice);
                 }
 
                 clovaConnectedThread = new ClovaConnectedThread(clovaBluetoothSocket);
@@ -340,8 +340,8 @@ public class ClovaSPPConnector {
             }
         }
 
-        public void sendScheme(Uri url) {
-            byte[] bytes = Base64.encodeBase64(url.toString().getBytes());
+        public void sendScheme(String url) {
+            byte[] bytes = Base64.encodeBase64(url.getBytes());
             byte[] bArr = new byte[bytes.length + 8];
             bArr[0] = 65;
             bArr[1] = 80;
